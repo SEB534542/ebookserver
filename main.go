@@ -13,5 +13,5 @@ func main() {
 
 func handlerMain(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	io.WriteString(w, `hallo<br><a href="./test.pdf">link text</a>`)
+	io.WriteString(w, `Main branch (works)<br><br><a href="./test.pdf">link text</a>`)
 }
