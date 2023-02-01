@@ -30,11 +30,11 @@ func main() {
 // knock takes a path to a .acsm file, tries to convert is using the binairy
 // knock in path folder. It returns the error from the binairy (if).
 func knock(path string) error {
-	output, err := exec.Command("./bin/knock", "./assets/test.acsm").Output()
+	output, err := exec.Command("./bin/knock", path).Output()
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(output))
+	log.Println(string(output))
 	return nil
 }
 
@@ -43,7 +43,7 @@ func handlerBooks(w http.ResponseWriter, r *http.Request) {
 	s := "<h1>Download books</h1>"
 	for _, fname := range files(folderAssets) {
 		if fname != "index.html" {
-			s += fmt.Sprintf("<a href='./%s'>%s</a><br>", fname, fname)
+			s += fmt.Sprintf("<a href='./%s'>%s</a><br><br>", fname, fname)
 		}
 	}
 	io.WriteString(w, s)

@@ -7,6 +7,7 @@ and is used under the MIT license with copyright 2020 to Ayooluwa Isaiah*/
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -43,11 +44,10 @@ func (pr *Progress) Write(p []byte) (n int, err error) {
 // Print displays the current progress of the file upload
 func (pr *Progress) Print() {
 	if pr.BytesRead == pr.TotalSize {
-		fmt.Println("DONE!")
+		log.Println("DONE!")
 		return
 	}
-
-	fmt.Printf("File upload in progress: %d\n", pr.BytesRead)
+	log.Printf("File upload in progress: %d\n", pr.BytesRead)
 }
 
 func handlerUpload(w http.ResponseWriter, r *http.Request) {
@@ -116,10 +116,13 @@ func handlerUpload(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if filepath.Ext(fileHeader.Filename) == knockExt {
-			knock(path)
+			err := knock(path)
+			if err != nil {
+				log.Printf("Unable to convert .acsm file to epub (%v)", err)
+			}
 		}
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	io.WriteString(w, "Upload successful<br><br><a href='./books'>Click here to list all books available for download</a>")
-	// fmt.Fprintf(w, "Upload successful<br><br><a href='./books'>Click here to list all books available for download</a>")
+	// fmt.Fprintf(w, "Upload successful")
 }
