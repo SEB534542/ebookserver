@@ -1,13 +1,24 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"net/http"
+	"os/exec"
 )
 
 func main() {
+	output, err := exec.Command("./bin/knock", "./assets/test.acsm").Output()
+	if err != nil {
+		fmt.Println("Error", err.Error())
+	}
+	fmt.Println(string(output))
+
+}
+
+func server() {
 	http.Handle("/", http.FileServer(http.Dir("./assets")))
-	http.HandleFunc("/test", handlerMain)
+	http.HandleFunc("/download", handlerMain)
 	http.ListenAndServe(":8080", nil)
 }
 
