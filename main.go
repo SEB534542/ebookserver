@@ -48,12 +48,12 @@ func (pr *Progress) Print() {
 	fmt.Printf("File upload in progress: %d\n", pr.BytesRead)
 }
 
-func IndexHandler(w http.ResponseWriter, r *http.Request) {
+func handlerMain(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "text/html")
 	http.ServeFile(w, r, "index.html")
 }
 
-func uploadHandler(w http.ResponseWriter, r *http.Request) {
+func handlerUpload(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -126,13 +126,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", IndexHandler)
-	mux.HandleFunc("/upload", uploadHandler)
-
-	if err := http.ListenAndServe(":4500", mux); err != nil {
-		log.Fatal(err)
-	}
+	startServer(8080)
 }
 
 // knock takes a path to a .acsm file, tries to convert is using the binairy
@@ -146,13 +140,20 @@ func knock(path string) error {
 	return nil
 }
 
-func server() {
+func startServer(port int) {
 	http.Handle("/", http.FileServer(http.Dir("./assets")))
-	http.HandleFunc("/download", handlerMain)
-	http.ListenAndServe(":8080", nil)
+	// http.HandleFunc("/", handlerMain)
+	http.HandleFunc("/upload", handlerUpload)
+	http.HandleFunc("/download", handlerDownload)
+	srv := &http.Server{
+		Addr:         ":" + fmt.Sprint(port),
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
+	log.Fatal(srv.ListenAndServe())
 }
 
-func handlerMain(w http.ResponseWriter, r *http.Request) {
+func handlerDownload(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	io.WriteString(w, `Main branch (works)<br><br><a href="./test.pdf">link text</a>`)
 }
