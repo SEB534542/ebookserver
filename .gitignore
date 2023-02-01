@@ -57,3 +57,6 @@ builds/**/images/*
 *.json
 *.gob
 *.xlsx
+*.pdf
+*.epub
+*.acsm
