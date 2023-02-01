@@ -6,9 +6,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
-	"strings"
-	"time"
 )
 
 const maxUploadSize = 1024 * 1024 * 20 // 1024 * 1024 = 1 MB
@@ -134,4 +133,26 @@ func main() {
 	if err := http.ListenAndServe(":4500", mux); err != nil {
 		log.Fatal(err)
 	}
+}
+
+// knock takes a path to a .acsm file, tries to convert is using the binairy
+// knock in path folder. It returns the error from the binairy (if).
+func knock(path string) error {
+	output, err := exec.Command("./bin/knock", "./assets/test.acsm").Output()
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(output))
+	return nil
+}
+
+func server() {
+	http.Handle("/", http.FileServer(http.Dir("./assets")))
+	http.HandleFunc("/download", handlerMain)
+	http.ListenAndServe(":8080", nil)
+}
+
+func handlerMain(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	io.WriteString(w, `Main branch (works)<br><br><a href="./test.pdf">link text</a>`)
 }
