@@ -115,6 +115,7 @@ func handlerUpload(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
+		log.Printf("Uploaded %v", fileHeader.Filename)
 		if filepath.Ext(fileHeader.Filename) == knockExt {
 			err := knock(path)
 			if err != nil {
