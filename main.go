@@ -3,17 +3,22 @@ package main
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os/exec"
 	"time"
 )
 
+const (
+	folderAssets = "./assets" // Folder for up- and downloading.
+	knockExt     = ".acsm"    // Extension for which knock function is required
+)
+
 func main() {
-	http.Handle("/", http.FileServer(http.Dir("./assets")))
-	// http.HandleFunc("/", handlerMain)
+	http.Handle("/", http.FileServer(http.Dir(folderAssets)))
+	http.HandleFunc("/books", handlerBooks)
 	http.HandleFunc("/upload", handlerUpload)
-	http.HandleFunc("/download", handlerDownload)
 	srv := &http.Server{
 		Addr:         ":8080",
 		ReadTimeout:  5 * time.Second,
@@ -33,12 +38,25 @@ func knock(path string) error {
 	return nil
 }
 
-func handlerDownload(w http.ResponseWriter, r *http.Request) {
+func handlerBooks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	io.WriteString(w, `Main branch (works)<br><br><a href="./test.pdf">link text</a>`)
+	s := "<h1>Download books</h1>"
+	for _, fname := range files(folderAssets) {
+		if fname != "index.html" {
+			s += fmt.Sprintf("<a href='./%s'>%s</a><br>", fname, fname)
+		}
+	}
+	io.WriteString(w, s)
 }
 
-func handlerMain(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "text/html")
-	http.ServeFile(w, r, "index.html")
+func files(path string) []string {
+	files, err := ioutil.ReadDir(folderAssets)
+	if err != nil {
+		return []string{}
+	}
+	output := make([]string, len(files))
+	for i, file := range files {
+		output[i] = file.Name()
+	}
+	return output
 }

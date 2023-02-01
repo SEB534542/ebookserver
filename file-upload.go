@@ -95,12 +95,12 @@ func handlerUpload(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		err = os.MkdirAll("./uploads", os.ModePerm)
+		err = os.MkdirAll(folderAssets, os.ModePerm)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		path := fmt.Sprintf("./uploads/%s", fileHeader.Filename)
+		path := fmt.Sprintf("%s/%s", folderAssets, fileHeader.Filename)
 		f, err := os.Create(path)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -115,9 +115,11 @@ func handlerUpload(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		if filepath.Ext(fileHeader.Filename) == ".acsm" {
+		if filepath.Ext(fileHeader.Filename) == knockExt {
 			knock(path)
 		}
 	}
-	fmt.Fprintf(w, "Upload successful")
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	io.WriteString(w, "Upload successful<br><br><a href='./books'>Click here to list all books available for download</a>")
+	// fmt.Fprintf(w, "Upload successful<br><br><a href='./books'>Click here to list all books available for download</a>")
 }
