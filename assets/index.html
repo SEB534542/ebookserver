@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Ebook server</title>
+  </head>
+  <body>
+	<h1>Ebook server</h1>
+	<p>Upload epub, pdf, text or acms files to server. Acms files are converted to pdf (if possible).</p>
+    <form
+      id="form"
+      enctype="multipart/form-data"
+      action="/upload"
+      method="POST"
+    >
+      <input class="input file-input" type="file" name="file" multiple />
+      <button class="button" type="submit">Submit</button>
+    </form>
+	<p><a href='./books'>List ebooks available for download</a></p>
+  </body>
+</html>
