@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
 	"time"
 )
@@ -19,6 +20,7 @@ func main() {
 	http.Handle("/", http.FileServer(http.Dir(folderAssets)))
 	http.HandleFunc("/books", handlerBooks)
 	http.HandleFunc("/upload", handlerUpload)
+	http.HandleFunc("/delete/", handlerDelete)
 	srv := &http.Server{
 		Addr:         ":4500",
 		ReadTimeout:  5 * time.Second,
@@ -38,17 +40,20 @@ func knock(path string) error {
 	return nil
 }
 
+// handlerbook lists the books on the server.
 func handlerBooks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	s := "<h1>Download books</h1>"
+	s := "<h1>Download books</h1><table cellpadding='5'>"
 	for _, fname := range files(folderAssets) {
 		if fname != "index.html" {
-			s += fmt.Sprintf("<a href='./%s'>%s</a><br><br>", fname, fname)
+			s += fmt.Sprintf("<tr><td><a href='./%s'>%s</a></td><td>&emsp;&emsp;&emsp;<i><a href='./delete/%s'>delete</a></i></td></tr>", fname, fname, fname)
 		}
 	}
+	s += "</table><p><a href='/'>Click here to go back</a></p>"
 	io.WriteString(w, s)
 }
 
+// files takes a path to a directory and returns a slice containing all files in that directory.
 func files(path string) []string {
 	files, err := ioutil.ReadDir(folderAssets)
 	if err != nil {
@@ -59,4 +64,21 @@ func files(path string) []string {
 		output[i] = file.Name()
 	}
 	return output
+}
+
+// handlerDelete deletes the specified file from the server.
+func handlerDelete(w http.ResponseWriter, r *http.Request) {
+	file := r.URL.Path[len("/delete/"):]
+	if file == "" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	err := os.Remove(fmt.Sprintf("%s/%s", folderAssets, file))
+	if err != nil {
+		log.Printf("Unable to delete file '%v': %v", file, err)
+		http.Error(w, fmt.Sprint("Unable to delete file", file), http.StatusBadRequest)
+		return
+	}
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	io.WriteString(w, "File succesfully deleted<br><br><a href='/'>Click here to go back</a>")
 }
