@@ -14,6 +14,7 @@ import (
 const (
 	folderAssets = "./assets" // Folder for up- and downloading.
 	knockExt     = ".acsm"    // Extension for which knock function is required
+	port         = ":4500"    // Port to access app
 )
 
 func main() {
@@ -22,15 +23,15 @@ func main() {
 	http.HandleFunc("/upload", handlerUpload)
 	http.HandleFunc("/delete/", handlerDelete)
 	srv := &http.Server{
-		Addr:         ":4500",
+		Addr:         port,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
 	log.Fatal(srv.ListenAndServe())
 }
 
-// knock takes a path to a .acsm file, tries to convert is using the binairy
-// knock in path folder. It returns the error from the binairy (if).
+// knock takes a path to a .acsm file, tries to convert it using the binairy
+// file 'knock' in path folder. It returns the error from the binairy (if).
 func knock(path string) error {
 	output, err := exec.Command("./bin/knock", path).Output()
 	if err != nil {

@@ -21,6 +21,7 @@ var allowedFtypes = []string{
 	"application/epub+zip",
 	"application/zip",
 	"text/plain; charset=utf-8",
+	"application/octet-stream",
 }
 
 // Progress is used to track the progress of a file upload.

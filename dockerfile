@@ -9,6 +9,6 @@ COPY ./assets/index.html ./assets/index.html
 
 RUN go build -o /ebs
 
-EXPOSE 8081
+EXPOSE 4500
 
 CMD [ "/ebs" ]
