@@ -81,5 +81,5 @@ func handlerDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	io.WriteString(w, "File succesfully deleted<br><br><a href='/'>Click here to go back</a>")
+	io.WriteString(w, "File succesfully deleted<br><br><a href='/books'>Click here to go back</a>")
 }
